@@ -12,16 +12,26 @@ class FileStorage:
     __objects = {}
 
     def all(self):
-        """returns the dictionary __objects"""
+        """
+        Returns the dictionary of all stored objects.
+        """
         return FileStorage.__objects
 
     def new(self, obj):
-        """sets in __objects the obj with key <obj class name>.id"""
+        """
+        Adds a new object to storage with key <obj class name>.id.
+        """
         key = "{}.{}".format(type(obj).__name__, obj.id)
         FileStorage.__objects[key] = obj
 
     def save(self):
-        """ serializes __objects to the JSON file (path: __file_path)"""
+        """
+        Serializes __objects to the JSON file (path: __file_path).
+        Ensures the directory exists before saving.
+        """
+        dir_name = os.path.dirname(FileStorage.__file_path)
+        if dir_name and not os.path.exists(dir_name):
+            os.makedirs(dir_name)
         with open(FileStorage.__file_path, "w", encoding="utf-8") as f:
             d = {k: v.to_dict() for k, v in FileStorage.__objects.items()}
             json.dump(d, f)
@@ -46,15 +56,37 @@ class FileStorage:
         return classes
 
     def reload(self):
-        """Reloads the stored objects"""
+        """
+        Reloads the stored objects from the JSON file.
+        Merges loaded objects with existing ones.
+        Handles errors gracefully if file is missing or corrupted.
+        """
         if not os.path.isfile(FileStorage.__file_path):
             return
-        with open(FileStorage.__file_path, "r", encoding="utf-8") as f:
-            obj_dict = json.load(f)
-            obj_dict = {k: self.classes()[v["__class__"]](**v)
-                        for k, v in obj_dict.items()}
-            # TODO: should this overwrite or insert?
-            FileStorage.__objects = obj_dict
+        try:
+            with open(FileStorage.__file_path, "r", encoding="utf-8") as f:
+                obj_dict = json.load(f)
+                # print(type(obj_dict))
+                for key, value in obj_dict.items():
+                    [class_name, object_id] = key.split(".")
+                    # print(object_id)
+                    # print(class_name)
+                    object_class = self.classes().get(class_name)
+                    if object_class:
+                        FileStorage.__objects[key] = object_class(**value)
+            # print("Loaded objects:", list(FileStorage.__objects.keys()))
+        except (json.JSONDecodeError, IOError) as e:
+            print(f"[FileStorage] Warning: Could not reload objects: {e}")
+
+    def delete(self, obj=None):
+        """
+        Deletes obj from __objects if it exists.
+        """
+        if obj is None:
+            return
+        key = f"{type(obj).__name__}.{obj.id}"
+        if key in FileStorage.__objects:
+            del FileStorage.__objects[key]
 
     def attributes(self):
         """Returns the valid attributes and their types for class name"""

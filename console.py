@@ -1,7 +1,6 @@
 #!/usr/bin/python3
 """Defines AirBnB console."""
 import cmd
-from models import storage
 from models.base_model import BaseModel
 from models.user import User
 from models.state import State
@@ -9,6 +8,7 @@ from models.city import City
 from models.place import Place
 from models.amenity import Amenity
 from models.review import Review
+from models import storage
 
 
 class HBNBCommand(cmd.Cmd):
@@ -213,6 +213,7 @@ class HBNBCommand(cmd.Cmd):
             obj.__dict__.update({attribute_name: attribute_value})
 
         storage.save()
+
 
 if __name__ == "__main__":
     HBNBCommand().cmdloop()

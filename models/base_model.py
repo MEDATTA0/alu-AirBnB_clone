@@ -23,6 +23,7 @@ class BaseModel:
             self.id = str(uuid4())
             self.created_at = datetime.now()
             self.updated_at = datetime.now()
+            # print(self.to_dict())
             return
         for key, value in kwargs.items():
             if key == "__class__":
@@ -49,9 +50,12 @@ class BaseModel:
 
     def save(self):
         """
-        Updates the updated_at timestamp to current time.
+        Updates the updated_at timestamp to current time and saves the instance to storage.
         """
+        from models import storage
         self.updated_at = datetime.now()
+        storage.new(self)
+        storage.save()
 
     def to_dict(self):
         """
