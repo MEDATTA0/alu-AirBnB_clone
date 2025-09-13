@@ -23,10 +23,21 @@ class BaseModel:
             self.created_at = datetime.now()
             self.updated_at = datetime.now()
             return
-        for key, value in kwargs:
-            if key not in ["arg"]:
-                raise Exception(f"{key} is not allowed")
-            self[key] = value
+        for key, value in kwargs.items():
+            if key == "__class__":
+                continue
+            if (key in ["created_at", "updated_at"]):
+                try:
+                    casted_time = datetime.fromisoformat(value)
+                    setattr(self, key, casted_time)
+                    continue
+                except:
+                    raise Exception(f"date time is not iso format")
+
+            if key == "id":
+                setattr(self, key, str(value))
+            else:
+                setattr(self, key, value)
 
     def __str__(self):
         """
