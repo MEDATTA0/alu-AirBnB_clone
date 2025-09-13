@@ -6,6 +6,7 @@ from datetime import datetime
 class BaseModel:
     """
     BaseModel defines common attributes/methods for other classes.
+
     Attributes:
         id (str): Unique identifier for each instance.
         created_at (datetime): Timestamp of instance creation.
