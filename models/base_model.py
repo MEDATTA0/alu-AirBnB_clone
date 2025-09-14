@@ -56,7 +56,8 @@ class BaseModel:
 
     def save(self):
         """
-        Updates the updated_at timestamp to current time and saves the instance to storage.
+        Updates the updated_at timestamp to current time
+          and saves the instance to storage.
         """
         from models import storage
         self.updated_at = datetime.now()
