@@ -1,6 +1,3 @@
-#!/usr/bin/python3
-"""BaseModel module defining the BaseModel class."""
-
 import models
 from uuid import uuid4
 from datetime import datetime
@@ -22,23 +19,30 @@ class BaseModel:
         If kwargs is empty, generates new id and timestamps.
         If kwargs is provided, sets attributes from kwargs.
         """
-        if not kwargs:
+        if len(kwargs) == 0:
             self.id = str(uuid4())
             self.created_at = datetime.now()
             self.updated_at = datetime.now()
+            # Add new instance to storage
+            from models import storage
+            storage.new(self)
             return
-
         for key, value in kwargs.items():
             if key == "__class__":
                 continue
-            if key in ["created_at", "updated_at"]:
+            if (key in ["created_at", "updated_at"]):
+                if value is None:
+                    raise TypeError(f"{key} cannot be None")
                 try:
                     casted_time = datetime.fromisoformat(value)
                     setattr(self, key, casted_time)
                     continue
-                except Exception:
-                    raise Exception("date time is not iso format")
+                except:
+                    raise Exception(f"date time is not iso format")
+
             if key == "id":
+                if value is None:
+                    raise TypeError("id cannot be None")
                 setattr(self, key, str(value))
             else:
                 setattr(self, key, value)
@@ -48,14 +52,11 @@ class BaseModel:
         Returns a string representation of the instance.
         Format: [ClassName] (id) {attribute_dict}
         """
-        return (
-            f"[{self.__class__.__name__}] ({self.id}) "
-            f"{self.__dict__}"
-        )
+        return f"[{self.__class__.__name__}] ({self.id}) {self.__dict__}"
 
     def save(self):
         """
-        Updates updated_at to current time and saves instance to storage.
+        Updates the updated_at timestamp to current time and saves the instance to storage.
         """
         from models import storage
         self.updated_at = datetime.now()
@@ -64,13 +65,16 @@ class BaseModel:
 
     def to_dict(self):
         """
-        Returns a dictionary of instance attributes.
+        Returns a dictionary of the instance attributes.
         Converts datetime attributes to ISO format strings.
         """
         obj = {}
         for key, value in self.__dict__.items():
             if key in ["created_at", "updated_at"]:
-                obj[key] = value.isoformat()
+                obj.__setitem__(key, value.isoformat())
                 continue
             obj[key] = value
+
+        # Add class name
+        obj["__class__"] = self.__class__.__name__
         return obj
