@@ -43,7 +43,7 @@ class TestUser(unittest.TestCase):
         self.user.password = "password123"
         self.user.first_name = "John"
         self.user.last_name = "Doe"
-        
+
         self.assertEqual(self.user.email, "test@example.com")
         self.assertEqual(self.user.password, "password123")
         self.assertEqual(self.user.first_name, "John")
@@ -55,9 +55,9 @@ class TestUser(unittest.TestCase):
         self.user.password = "password123"
         self.user.first_name = "John"
         self.user.last_name = "Doe"
-        
+
         obj_dict = self.user.to_dict()
-        
+
         self.assertEqual(obj_dict["__class__"], "User")
         self.assertEqual(obj_dict["email"], "test@example.com")
         self.assertEqual(obj_dict["password"], "password123")
@@ -75,9 +75,9 @@ class TestUser(unittest.TestCase):
             "first_name": "John",
             "last_name": "Doe"
         }
-        
+
         user = User(**test_dict)
-        
+
         self.assertEqual(user.id, "test-id")
         self.assertEqual(user.email, "test@example.com")
         self.assertEqual(user.password, "password123")
@@ -88,7 +88,7 @@ class TestUser(unittest.TestCase):
         """Test User string representation"""
         self.user.email = "test@example.com"
         self.user.first_name = "John"
-        
+
         expected = f"[User] ({self.user.id}) {self.user.__dict__}"
         self.assertEqual(str(self.user), expected)
 
